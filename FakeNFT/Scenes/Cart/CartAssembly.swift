@@ -1,6 +1,6 @@
 import UIKit
 
-public final class CartAssembly {
+final class CartAssembly {
     
     // MARK: - Dependencies
     private let servicesAssembly: ServicesAssembly

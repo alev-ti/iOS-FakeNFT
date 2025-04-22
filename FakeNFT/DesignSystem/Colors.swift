@@ -36,31 +36,31 @@ extension UIColor {
     static let yaLightGrayDark = UIColor(hexString: "#2C2C2E")
 
     static let segmentActive = UIColor { traits in
-        return traits.userInterfaceStyle == .dark
+        traits.userInterfaceStyle == .dark
         ? .yaBlackDark
         : .yaBlackLight
     }
 
     static let segmentInactive = UIColor { traits in
-        return traits.userInterfaceStyle == .dark
+        traits.userInterfaceStyle == .dark
         ? .yaLightGrayDark
         : .yaLightGrayLight
     }
 
     static let closeButton = UIColor { traits in
-        return traits.userInterfaceStyle == .dark
+        traits.userInterfaceStyle == .dark
         ? .yaBlackDark
         : .yaBlackLight
     }
     
     static let iconButton = UIColor { traits in
-        return traits.userInterfaceStyle == .dark
+        traits.userInterfaceStyle == .dark
         ? .yaBlackDark
         : .yaBlackLight
     }
     
     static let themeFont = UIColor { traits in
-        return traits.userInterfaceStyle == .dark
+        traits.userInterfaceStyle == .dark
         ? .yaBlackDark
         : .yaBlackLight
     }

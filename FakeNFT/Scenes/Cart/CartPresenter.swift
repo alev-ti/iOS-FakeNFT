@@ -49,16 +49,22 @@ final class CartPresenterImpl: CartPresenter {
     // MARK: - Public Methods
     
     func viewDidLoad() {
-        view?.showLoading()
+        guard let view = view else { return }
+        
+        view.showLoading()
+        
         loadNfts(byIDs: testNFTs) { [weak self] in
-            self?.updateNFTs()
-            self?.view?.toggleEmptyCartView(show: self?.nfts.isEmpty ?? true)
-            self?.view?.updateCollectionView()
-            self?.view?.configurePrice(
-                with: self?.getTotal() ?? 0,
-                nftsCount: self?.nfts.count ?? 0
-            )
-            self?.view?.hideLoading()
+            guard let self = self else { return }
+            
+            self.updateNFTs()
+            let isEmpty = self.nfts.isEmpty
+            let totalPrice = self.getTotal()
+            let count = self.nfts.count
+            
+            view.toggleEmptyCartView(show: isEmpty)
+            view.updateCollectionView()
+            view.configurePrice(with: totalPrice, nftsCount: count)
+            view.hideLoading()
         }
     }
     
@@ -94,18 +100,15 @@ final class CartPresenterImpl: CartPresenter {
     }
     
     private func updateNFTs() {
-        guard let nfts = getNFTsInCartByID(nftsInCart: Array(CartStore.cartItemIDs)) else { return }
-        self.nfts = nfts
+        let cartItemIDs = Array(CartStore.cartItemIDs)
+        guard let cartNFTs = fetchNFTs(by: cartItemIDs) else { return }
+        self.nfts = cartNFTs
     }
-    
-    private func getNFTsInCartByID(nftsInCart: [String]) -> [Nft]? {
-        var nfts: [Nft] = []
-        for id in nftsInCart {
-            if let nft = nftService.getNftFromStorage(by: id) {
-                nfts.append(nft)
-            }
+
+    private func fetchNFTs(by ids: [String]) -> [Nft]? {
+        ids.compactMap { id in
+            nftService.getNftFromStorage(by: id)
         }
-        return nfts
     }
     
     private func loadNfts(byIDs ids: [String], completion: @escaping () -> Void) {
