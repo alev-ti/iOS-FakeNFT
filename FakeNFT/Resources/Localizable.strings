@@ -8,3 +8,6 @@
 "Error.unknown" = "Произошла неизвестная ошибка";
 "Error.repeat" = "Повторить";
 "Error.title" = "Ошибка";
+"RemoveFromCart.labelText" = "Вы уверены, что хотите удалить объект из корзины?";
+"RemoveFromCart.removeBtnText" = "Удалить";
+"RemoveFromCart.returnBtnText" = "Вернуться";

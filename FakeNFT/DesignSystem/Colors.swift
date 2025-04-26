@@ -65,6 +65,24 @@ extension UIColor {
         : .yaBlackLight
     }
     
+    static let dynamicBlack = UIColor { traits in
+        return traits.userInterfaceStyle == .dark
+        ? UIColor.yaBlackDark
+        : UIColor.yaBlackLight
+    }
+    
+    static let dynamicWhite = UIColor { traits in
+        return traits.userInterfaceStyle == .dark
+        ? UIColor.yaWhiteDark
+        : UIColor.yaWhiteLight
+    }
+    
+    static let dynamicLightGray = UIColor { traits in
+        return traits.userInterfaceStyle == .dark
+        ? UIColor.yaLightGrayDark
+        : UIColor.yaLightGrayLight
+    }
+    
     //MARK: Universal
     
     static let yaGrayUniversal = UIColor(hexString: "#625C5C")
