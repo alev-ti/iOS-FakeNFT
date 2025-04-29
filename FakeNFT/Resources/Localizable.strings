@@ -11,3 +11,8 @@
 "RemoveFromCart.labelText" = "Вы уверены, что хотите удалить объект из корзины?";
 "RemoveFromCart.removeBtnText" = "Удалить";
 "RemoveFromCart.returnBtnText" = "Вернуться";
+"Sorting.price" = "По цене";
+"Sorting.name" = "По названию";
+"Sorting.rating" = "По рейтингу";
+"Sorting.cancelButtonTitle" = "Отменить";
+"Sorting.alertTitle" = "Сортировка";
