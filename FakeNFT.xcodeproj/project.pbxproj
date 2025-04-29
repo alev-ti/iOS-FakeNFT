@@ -52,6 +52,7 @@
 		B9867B352DBD343100D5E1CD /* CurrencyStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9867B342DBD343000D5E1CD /* CurrencyStorage.swift */; };
 		B9867B372DBD346100D5E1CD /* CurrenciesRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9867B362DBD345F00D5E1CD /* CurrenciesRequest.swift */; };
 		B9867B392DBD348800D5E1CD /* PaymentRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9867B382DBD348600D5E1CD /* PaymentRequest.swift */; };
+		B987C84F2DC0D47300E413D4 /* Collection+extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B987C84E2DC0D46400E413D4 /* Collection+extension.swift */; };
 		B9AF5AAB2DB5183D00CC2708 /* CartStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9AF5AAA2DB5183800CC2708 /* CartStore.swift */; };
 		B9AF5AB42DB51BB400CC2708 /* AlertViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9AF5AB32DB51BAA00CC2708 /* AlertViewModel.swift */; };
 		B9AF5ABC2DB5334300CC2708 /* RatingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9AF5ABB2DB5333D00CC2708 /* RatingView.swift */; };
@@ -125,6 +126,7 @@
 		B9867B342DBD343000D5E1CD /* CurrencyStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrencyStorage.swift; sourceTree = "<group>"; };
 		B9867B362DBD345F00D5E1CD /* CurrenciesRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrenciesRequest.swift; sourceTree = "<group>"; };
 		B9867B382DBD348600D5E1CD /* PaymentRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentRequest.swift; sourceTree = "<group>"; };
+		B987C84E2DC0D46400E413D4 /* Collection+extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Collection+extension.swift"; sourceTree = "<group>"; };
 		B9AF5AAA2DB5183800CC2708 /* CartStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartStore.swift; sourceTree = "<group>"; };
 		B9AF5AB32DB51BAA00CC2708 /* AlertViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertViewModel.swift; sourceTree = "<group>"; };
 		B9AF5ABB2DB5333D00CC2708 /* RatingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RatingView.swift; sourceTree = "<group>"; };
@@ -336,6 +338,7 @@
 				3F6806D629CBC50A00B4F915 /* CellsReusingUtils.swift */,
 				3FC8C39229D246BA0081F015 /* DateFormatters+Presets.swift */,
 				0CFCB74A2A780EA80009A829 /* UIView+Constraints.swift */,
+				B987C84E2DC0D46400E413D4 /* Collection+extension.swift */,
 			);
 			path = Foundation;
 			sourceTree = "<group>";
@@ -565,6 +568,7 @@
 				3F68069B29CBBAF100B4F915 /* ProductDetailsTableViewController.swift in Sources */,
 				0CFCB7402A78002A0009A829 /* ExamplePutService.swift in Sources */,
 				B9867B312DBD33D100D5E1CD /* SetCurrencyIDResponse.swift in Sources */,
+				B987C84F2DC0D47300E413D4 /* Collection+extension.swift in Sources */,
 				3F6806D529CBBEC700B4F915 /* NetworkTask.swift in Sources */,
 				0CF2C2DB2A783C1B00FDC837 /* LoadingView.swift in Sources */,
 				B9AF5ABC2DB5334300CC2708 /* RatingView.swift in Sources */,

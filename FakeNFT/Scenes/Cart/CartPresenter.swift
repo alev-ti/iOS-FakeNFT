@@ -91,9 +91,8 @@ final class CartPresenter: CartPresenterProtocol {
     }
     
     private func loadNftLargeImage() {
-        guard let imageUrlLight = nfts.first?.images[2],
-              let imageUrlDark = nfts.first?.images[1]
-        else { return }
+        guard let imageUrlLight = nfts[safe: 0]?.images[safe: 2],
+              let imageUrlDark = nfts[safe: 0]?.images[safe: 1] else { return }
         
         let imageURL = view?.traitCollection.userInterfaceStyle == .dark ? imageUrlDark : imageUrlLight
         

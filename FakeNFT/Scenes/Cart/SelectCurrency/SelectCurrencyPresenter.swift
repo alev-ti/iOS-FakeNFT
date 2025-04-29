@@ -48,7 +48,7 @@ final class SelectCurrencyPresenter: SelectCurrencyPresenterProtocol {
         view.showLoading()
         
         currencyService.setCurrencyIDBeforePayment(String(indexPath.row)) { [weak self] result in
-            guard let self = self else { return }
+            guard self != nil else { return }
             
             switch result {
             case .success(let response):
