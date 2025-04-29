@@ -55,12 +55,12 @@ final class CartPresenter: CartPresenterProtocol {
                 switch result {
                 case .success(let nft):
                     nfts.append(nft)
-                    case .failure(_):
-                    guard let self, let view = self.view else {return}
+                case .failure:
+                    guard let self, let view = self.view else { return }
                     
                     let action = AlertModel.Action(title: "Попробовать снова", style: .default) {
                         self.updateNFTs() { [weak self] in
-                            guard let self else {return}
+                            guard let self else { return }
                             view.toggleEmptyCartView(show: nfts.isEmpty)
                             view.updateCollectionView()
                             view.configurePrice(with: getTotal(), nftsCount: self.nfts.count)
@@ -101,7 +101,7 @@ final class CartPresenter: CartPresenterProtocol {
     }
     
     func removeButtonTapped(at indexPath: IndexPath) {
-        guard let view else {return}
+        guard let view else { return }
         
         let removeFromCartAssembly = RemoveFromCartAssembly()
         guard let removeFromCartVC = removeFromCartAssembly.assemble() as? RemoveFromCartViewProtocol else { return }
@@ -111,14 +111,14 @@ final class CartPresenter: CartPresenterProtocol {
         removeFromCartVC.configureScreen(with: self.nfts[indexPath.row])
 
         removeFromCartVC.onConfirm = { [weak self] in
-            guard let self else {return}
+            guard let self else { return }
             
             let nftID = self.nfts[indexPath.row].id
             
             removeFromNFTs(at: indexPath.row)
             
             view.performBatchUpdate(deletionAt: indexPath) { [weak self] in
-                guard let self else {return}
+                guard let self else { return }
                 self.deleteNftFromCart(with: nftID)
             }
         }
@@ -136,7 +136,7 @@ final class CartPresenter: CartPresenterProtocol {
     
     func paymentButtonTapped() {
         let payAssembly = SelectCurrencyAssembly(servicesAssembly: serviceAssembly)
-        guard let payViewController = payAssembly.assemble() as? SelectCurrencyViewProtocol else {return}
+        guard let payViewController = payAssembly.assemble() as? SelectCurrencyViewProtocol else { return }
         payViewController.hidesBottomBarWhenPushed = true
 
         guard let view else { return }
