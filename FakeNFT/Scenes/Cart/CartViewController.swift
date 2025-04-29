@@ -19,9 +19,9 @@ final class CartViewController: UIViewController, CartView {
         static let filterButtonIcon = "sort_icon"
         static let deleteNftIcon = "delete_icon"
         static let nftStubImage = "nft_stub"
-        static let costString = NSLocalizedString("Cart.price", comment: "")
-        static let payButtonString = NSLocalizedString("Cart.toPayment", comment: "")
-        static let emptyCartLabelString = NSLocalizedString("Cart.cartIsEmpty", comment: "")
+        static let costString = Localizable.CartView.costString
+        static let payButtonString = Localizable.CartView.payButtonString
+        static let emptyCartLabelString = Localizable.CartView.emptyCartLabelString
     }
     
     // MARK: - Properties

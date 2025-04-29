@@ -8,7 +8,7 @@ protocol CartPresenterProtocol {
     func removeButtonTapped(at indexPath: IndexPath)
 }
 
-final class CartPresenter: CartPresenterProtocol {
+final class CartPresenter: CartPresenterProtocol, SortingDelegate {
     
     // MARK: - Properties
     
@@ -130,7 +130,26 @@ final class CartPresenter: CartPresenterProtocol {
     }
     
     func filterButtonTapped() {
-        print("CartPresenter: filter button tapped")
+         view?.showAlert(SortingManager.makeSortingAlert(for: self))
+     }
+    
+    func didSelectSortingMethod(_ method: SortingMethod) {
+        let originalData = nfts
+        nfts.sort { $0.isOrderedBefore($1, by: method) }
+        
+        var fromIndexPaths = [IndexPath]()
+        var toIndexPaths = [IndexPath]()
+        
+        for (newIndex, nft) in nfts.enumerated() {
+            if let oldIndex = originalData.firstIndex(where: { $0.id == nft.id }), oldIndex != newIndex {
+                fromIndexPaths.append(IndexPath(item: oldIndex, section: 0))
+                toIndexPaths.append(IndexPath(item: newIndex, section: 0))
+            }
+        }
+        
+        if fromIndexPaths != toIndexPaths {
+            view?.performBatchUpdate(moveFrom: fromIndexPaths, to: toIndexPaths) {}
+        }
     }
     
     func paymentButtonTapped() {
