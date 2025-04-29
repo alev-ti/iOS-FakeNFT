@@ -11,7 +11,7 @@ final class CartAssembly {
     }
     
     // MARK: - Public Interface
-    public func assemble() -> UIViewController {
+    func assemble() -> UIViewController {
         let presenter = makePresenter()
         let viewController = makeViewController(with: presenter)
         configureConnections(presenter: presenter, viewController: viewController)
@@ -20,15 +20,15 @@ final class CartAssembly {
     }
     
     // MARK: - Private Methods
-    private func makePresenter() -> CartPresenterImpl {
-        CartPresenterImpl(nftService: servicesAssembly.nftService)
+    private func makePresenter() -> CartPresenter {
+        CartPresenter(nftService: servicesAssembly.nftService, serviceAssembly: servicesAssembly)
     }
     
-    private func makeViewController(with presenter: CartPresenter) -> CartViewController {
+    private func makeViewController(with presenter: CartPresenterProtocol) -> CartViewController {
         CartViewController(presenter: presenter)
     }
     
-    private func configureConnections(presenter: CartPresenterImpl, viewController: CartViewController) {
+    private func configureConnections(presenter: CartPresenter, viewController: CartViewController) {
         presenter.view = viewController
     }
 }

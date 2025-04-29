@@ -1,45 +1,37 @@
 import Foundation
 
-protocol CartPresenter {
+protocol CartPresenterProtocol {
     func getNFTs() -> [Nft]?
     func viewDidLoad()
     func filterButtonTapped()
     func paymentButtonTapped()
-    func deleteNFT(with id: String)
+    func removeButtonTapped(at indexPath: IndexPath)
 }
 
-final class CartPresenterImpl: CartPresenter {
+final class CartPresenter: CartPresenterProtocol {
     
     // MARK: - Properties
     
     weak var view: CartView?
+    var serviceAssembly: ServicesAssembly
     private let nftService: NftService
-    
-    private let testNFTs: [String] = [
-        "b2f44171-7dcd-46d7-a6d3-e2109aacf520",
-        "1464520d-1659-4055-8a79-4593b9569e48",
-        "fa03574c-9067-45ad-9379-e3ed2d70df78"
-    ]
-    
-    private let testNFTsInCart: [String] = [
-        "b2f44171-7dcd-46d7-a6d3-e2109aacf520",
-        "1464520d-1659-4055-8a79-4593b9569e48",
-        "fa03574c-9067-45ad-9379-e3ed2d70df78"
-    ]
     
     private var nfts: [Nft] = [] {
         didSet {
-            view?.toggleEmptyCartView(show: nfts.isEmpty)
-            view?.configurePrice(with: getTotal(), nftsCount: nfts.count)
+            guard let view else { return }
+            view.toggleEmptyCartView(show: nfts.isEmpty)
+            view.configurePrice(with: getTotal(), nftsCount: nfts.count)
+            
         }
     }
     
     // MARK: - Initialization
     
-    init(nftService: NftService) {
+    init(nftService: NftService, serviceAssembly: ServicesAssembly) {
+        self.serviceAssembly = serviceAssembly
         self.nftService = nftService
-        setupObservers()
-        addNFTsToCart(nftIDs: testNFTsInCart)
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(cartDidChange), name: CartStore.cartChangedNotification, object: nil)
     }
     
     deinit {
@@ -49,27 +41,88 @@ final class CartPresenterImpl: CartPresenter {
     // MARK: - Public Methods
     
     func viewDidLoad() {
-        guard let view = view else { return }
+        updateCart()
+    }
+    
+    private func getNFTsInCartByID(nftsInCart: [String], completion: @escaping ([Nft]) -> Void) {
+        var nfts: [Nft] = []
+        let dispatchGroup = DispatchGroup()
         
-        view.showLoading()
+        for id in nftsInCart {
+            dispatchGroup.enter()
+            
+            nftService.loadNft(id: id) { [weak self] result in
+                switch result {
+                case .success(let nft):
+                    nfts.append(nft)
+                case .failure:
+                    guard let self, let view = self.view else { return }
+                    
+                    let action = AlertModel.Action(title: "Попробовать снова", style: .default) {
+                        self.updateNFTs() { [weak self] in
+                            guard let self else { return }
+                            view.toggleEmptyCartView(show: nfts.isEmpty)
+                            view.updateCollectionView()
+                            view.configurePrice(with: getTotal(), nftsCount: self.nfts.count)
+                        }
+                    }
+                    
+                    let alert = AlertModel(title: "Не удалось загрузить NFT", message: "", actions: [action])
+                    view.showAlert(alert)
+                }
+                dispatchGroup.leave()
+            }
+        }
         
-        loadNfts(byIDs: testNFTs) { [weak self] in
-            guard let self = self else { return }
-            
-            self.updateNFTs()
-            let isEmpty = self.nfts.isEmpty
-            let totalPrice = self.getTotal()
-            let count = self.nfts.count
-            
-            view.toggleEmptyCartView(show: isEmpty)
+        dispatchGroup.notify(queue: .main) {
+            completion(nfts)
+        }
+    }
+    
+    private func updateCart() {
+        self.updateNFTs() { [weak self] in
+            guard let self, let view else { return }
+            self.loadNftLargeImage()
+            view.toggleEmptyCartView(show: nfts.isEmpty)
             view.updateCollectionView()
-            view.configurePrice(with: totalPrice, nftsCount: count)
+            view.configurePrice(with: getTotal(), nftsCount: self.nfts.count)
             view.hideLoading()
         }
     }
     
-    func deleteNFT(with id: String) {
-        CartStore.cartItemIDs.remove(id)
+    private func loadNftLargeImage() {
+        guard let imageUrlLight = nfts[safe: 0]?.images[safe: 2],
+              let imageUrlDark = nfts[safe: 0]?.images[safe: 1] else { return }
+        
+        let imageURL = view?.traitCollection.userInterfaceStyle == .dark ? imageUrlDark : imageUrlLight
+        
+        CartStore.NFTLargeImageURL = imageURL
+    }
+    
+    func removeButtonTapped(at indexPath: IndexPath) {
+        guard let view else { return }
+        
+        let removeFromCartAssembly = RemoveFromCartAssembly()
+        guard let removeFromCartVC = removeFromCartAssembly.assemble() as? RemoveFromCartViewProtocol else { return }
+        removeFromCartVC.modalPresentationStyle = .overFullScreen
+        removeFromCartVC.modalTransitionStyle = .crossDissolve
+        
+        removeFromCartVC.configureScreen(with: self.nfts[indexPath.row])
+
+        removeFromCartVC.onConfirm = { [weak self] in
+            guard let self else { return }
+            
+            let nftID = self.nfts[indexPath.row].id
+            
+            removeFromNFTs(at: indexPath.row)
+            
+            view.performBatchUpdate(deletionAt: indexPath) { [weak self] in
+                guard let self else { return }
+                self.deleteNftFromCart(with: nftID)
+            }
+        }
+        
+        view.present(removeFromCartVC, animated: true, completion: nil)
     }
     
     func getNFTs() -> [Nft]? {
@@ -81,7 +134,13 @@ final class CartPresenterImpl: CartPresenter {
     }
     
     func paymentButtonTapped() {
-        print("CartPresenter: payment button tapped")
+        let payAssembly = SelectCurrencyAssembly(servicesAssembly: serviceAssembly)
+        guard let payViewController = payAssembly.assemble() as? SelectCurrencyViewProtocol else { return }
+        payViewController.hidesBottomBarWhenPushed = true
+
+        guard let view else { return }
+        view.setupNavigationBarForNextScreen()
+        view.navigationController?.pushViewController(payViewController, animated: true)
     }
     
     // MARK: - Private Methods
@@ -96,48 +155,25 @@ final class CartPresenterImpl: CartPresenter {
     }
     
     @objc private func cartDidChange() {
-        updateNFTs()
+        updateCart()
     }
     
-    private func updateNFTs() {
-        let cartItemIDs = Array(CartStore.cartItemIDs)
-        guard let cartNFTs = fetchNFTs(by: cartItemIDs) else { return }
-        self.nfts = cartNFTs
-    }
-
-    private func fetchNFTs(by ids: [String]) -> [Nft]? {
-        ids.compactMap { id in
-            nftService.getNftFromStorage(by: id)
-        }
-    }
-    
-    private func loadNfts(byIDs ids: [String], completion: @escaping () -> Void) {
-        let dispatchGroup = DispatchGroup()
-        
-        ids.forEach { id in
-            dispatchGroup.enter()
-            nftService.loadNft(id: id) { result in
-                defer { dispatchGroup.leave() }
-                
-                switch result {
-                case .success(let nft):
-                    print("Loaded NFT: \(nft)")
-                case .failure(let error):
-                    print("Failed to load NFT: \(error.localizedDescription)")
-                }
-            }
-        }
-        
-        dispatchGroup.notify(queue: .main) {
+    private func updateNFTs(completion: @escaping ()-> Void) {
+        getNFTsInCartByID(nftsInCart: Array(CartStore.cartItemIDs),completion: { nfts in
+            self.nfts = nfts
             completion()
-        }
+        } )
+    }
+    
+    private func removeFromNFTs(at index: Int) {
+        nfts.remove(at: index)
+    }
+    
+    private func deleteNftFromCart(with id: String) {
+        CartStore.cartItemIDs.remove(id)
     }
     
     private func getTotal() -> Double {
         return nfts.reduce(0) { $0 + $1.price }
-    }
-    
-    private func addNFTsToCart(nftIDs: [String]) {
-        CartStore.cartItemIDs.formUnion(nftIDs)
     }
 }

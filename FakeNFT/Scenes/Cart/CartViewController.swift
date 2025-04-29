@@ -5,6 +5,10 @@ protocol CartView: UIViewController, LoadingView {
     func toggleEmptyCartView(show: Bool)
     func updateCollectionView()
     func configurePrice(with total: Double, nftsCount: Int)
+    func performBatchUpdate(deletionAt indexPath: IndexPath, completion: @escaping () -> Void)
+    func performBatchUpdate(moveFrom fromIndexPaths: [IndexPath], to toIndexPaths: [IndexPath], completion: @escaping () -> Void)
+    func setupNavigationBarForNextScreen()
+    func showAlert(_ alert: AlertModel)
 }
 
 final class CartViewController: UIViewController, CartView {
@@ -22,7 +26,7 @@ final class CartViewController: UIViewController, CartView {
     
     // MARK: - Properties
     
-    let presenter: CartPresenter
+    let presenter: CartPresenterProtocol
     
     private lazy var screenWidth = UIScreen.main.bounds.width
     private lazy var multiplierForView = screenWidth / 375.0
@@ -116,7 +120,7 @@ final class CartViewController: UIViewController, CartView {
     
     // MARK: - Initialization
     
-    init(presenter: CartPresenter) {
+    init(presenter: CartPresenterProtocol) {
         self.presenter = presenter
         super.init(nibName: nil, bundle: nil)
     }
@@ -150,6 +154,35 @@ final class CartViewController: UIViewController, CartView {
     
     func updateCollectionView() {
         collectionView.reloadData()
+    }
+    
+    func performBatchUpdate(deletionAt indexPath: IndexPath, completion: @escaping () -> Void) {
+        collectionView.performBatchUpdates({
+            self.collectionView.deleteItems(at: [indexPath])
+        }, completion: { _ in
+            completion()
+        })
+    }
+    
+    func performBatchUpdate(moveFrom fromIndexPaths: [IndexPath], to toIndexPaths: [IndexPath], completion: @escaping () -> Void) {
+        collectionView.performBatchUpdates({
+            for (fromIndexPath, toIndexPath) in zip(fromIndexPaths, toIndexPaths) {
+                self.collectionView.moveItem(at: fromIndexPath, to: toIndexPath)
+            }
+        }, completion: {_ in
+            completion()
+        })
+    }
+    
+    func setupNavigationBarForNextScreen() {
+        let backBarButton = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
+        navigationItem.backBarButtonItem = backBarButton
+        navigationController?.navigationBar.tintColor = UIColor.dynamicBlack
+    }
+    
+    func showAlert(_ alert: AlertModel) {
+        let alertController = alert.makeAlertController()
+        self.present(alertController, animated: true)
     }
     
     // MARK: - Private Methods
@@ -302,12 +335,6 @@ extension CartViewController: UICollectionViewDataSource, UICollectionViewDelega
 extension CartViewController: CartCellDelegate {
     func didTapButton(on cell: CartCell) {
         guard let indexPath = collectionView.indexPath(for: cell) else { return }
-        
-        let nftID = cell.getNftID()
-        presenter.deleteNFT(with: nftID)
-        
-        collectionView.performBatchUpdates {
-            collectionView.deleteItems(at: [indexPath])
-        }
+        presenter.removeButtonTapped(at: indexPath)
     }
 }
