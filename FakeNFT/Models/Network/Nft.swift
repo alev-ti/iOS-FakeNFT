@@ -20,3 +20,16 @@ struct Nft: Codable {
         self.id = id
     }
 }
+
+extension Nft {
+    func isOrderedBefore(_ other: Nft, by sortingMethod: SortingMethod) -> Bool {
+        switch sortingMethod {
+        case .price:
+            return price < other.price
+        case .name:
+            return name.localizedCompare(other.name) == .orderedAscending
+        case .rating:
+            return rating > other.rating
+        }
+    }
+}
