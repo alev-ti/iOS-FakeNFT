@@ -10,9 +10,9 @@ final class RemoveFromCartViewController: UIViewController, RemoveFromCartViewPr
     var onConfirm: (() -> Void)?
     
     private enum Constants {
-        static let labelText = NSLocalizedString("RemoveFromCart.labelText", comment: "")
-        static let removeBtnText = NSLocalizedString("RemoveFromCart.removeBtnText", comment: "")
-        static let returnBtnText = NSLocalizedString("RemoveFromCart.returnBtnText", comment: "")
+        static let labelText = Localizable.RemoveFromCart.labelText
+        static let removeBtnText = Localizable.RemoveFromCart.removeBtnText
+        static let returnBtnText = Localizable.RemoveFromCart.returnBtnText
     }
     
     private lazy var buttonsStackView: UIStackView = {
