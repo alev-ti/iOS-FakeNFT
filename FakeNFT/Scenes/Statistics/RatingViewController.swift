@@ -1,5 +1,3 @@
-// Scenes/Statistics/RatingViewController.swift
-
 import UIKit
 
 
@@ -12,6 +10,7 @@ protocol RatingViewProtocol: AnyObject {
 
 
 struct RatingViewModel {
+    let id: String
     let rank: Int
     let name: String
     let nftCount: Int
@@ -112,8 +111,8 @@ extension RatingViewController: UITableViewDataSource {
 extension RatingViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let vm = users[indexPath.row]
-        // Переходим на экран информации о пользователе
-        let detailVC = UserDetailAssembly.build(with: vm)
+        // теперь передаём vm.id, а не rawUser
+        let detailVC = UserDetailAssembly.build(userId: vm.id)
         navigationController?.pushViewController(detailVC, animated: true)
         tableView.deselectRow(at: indexPath, animated: true)
     }

@@ -1,19 +1,20 @@
 import Foundation
 
-
-struct User: Decodable {
-    
+struct UserDTO: Decodable {
     let id: String
     let name: String
     let avatar: String?
+    let description: String?
+    let website: String?
     let nfts: [String]
 }
 
-
 protocol UserServiceProtocol {
-    func fetchUsers(completion: @escaping (Result<[User], Error>) -> Void)
+    /// Список всех пользователей
+    func fetchUsers(completion: @escaping (Result<[UserDTO], Error>) -> Void)
+    /// Детали одного пользователя по ID
+    func fetchUser(id: String, completion: @escaping (Result<UserDTO, Error>) -> Void)
 }
-
 
 final class UserService: UserServiceProtocol {
     private let baseURL: URL
@@ -24,40 +25,61 @@ final class UserService: UserServiceProtocol {
         self.token   = token
     }
 
-    func fetchUsers(completion: @escaping (Result<[User], Error>) -> Void) {
-        
+    func fetchUsers(completion: @escaping (Result<[UserDTO], Error>) -> Void) {
         let url = baseURL.appendingPathComponent("users")
-        print("📡 Will request:", url.absoluteString)
         var request = URLRequest(url: url)
         request.setValue(token, forHTTPHeaderField: "X-Practicum-Mobile-Token")
 
-        URLSession.shared.dataTask(with: request) { data, response, error in
+        URLSession.shared.dataTask(with: request) { data, _, error in
             if let error = error {
-                completion(.failure(error)); return
-            }
-            if let http = response as? HTTPURLResponse {
-                print("🛂 HTTP Status:", http.statusCode)
-            }
-            guard let data = data else {
-                completion(.failure(NSError(
-                    domain: "UserService",
-                    code: -1,
-                    userInfo: [NSLocalizedDescriptionKey: "Пустой ответ"]
-                )))
+                completion(.failure(error))
                 return
             }
-            if let raw = String(data: data, encoding: .utf8) {
-                print("🔍 Raw /users response:\n\(raw)")
+            guard let data = data else {
+                let err = NSError(
+                    domain: "UserService",
+                    code: -1,
+                    userInfo: [NSLocalizedDescriptionKey: "Empty response"]
+                )
+                completion(.failure(err))
+                return
             }
             do {
-                let users = try JSONDecoder().decode([User].self, from: data)
-                print("✅ Decoded users count:", users.count)
+                let users = try JSONDecoder().decode([UserDTO].self, from: data)
                 completion(.success(users))
             } catch {
-                print("❌ JSON decode error:", error)
                 completion(.failure(error))
             }
-        }.resume()
+        }
+        .resume()
+    }
+
+    func fetchUser(id: String, completion: @escaping (Result<UserDTO, Error>) -> Void) {
+        let url = baseURL.appendingPathComponent("users/\(id)")
+        var request = URLRequest(url: url)
+        request.setValue(token, forHTTPHeaderField: "X-Practicum-Mobile-Token")
+
+        URLSession.shared.dataTask(with: request) { data, _, error in
+            if let error = error {
+                completion(.failure(error))
+                return
+            }
+            guard let data = data else {
+                let err = NSError(
+                    domain: "UserService",
+                    code: -1,
+                    userInfo: [NSLocalizedDescriptionKey: "Empty response"]
+                )
+                completion(.failure(err))
+                return
+            }
+            do {
+                let user = try JSONDecoder().decode(UserDTO.self, from: data)
+                completion(.success(user))
+            } catch {
+                completion(.failure(error))
+            }
+        }
+        .resume()
     }
 }
-
