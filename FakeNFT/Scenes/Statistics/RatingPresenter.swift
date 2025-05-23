@@ -43,10 +43,11 @@ final class RatingPresenter: RatingPresenterProtocol {
             DispatchQueue.main.async {
                 self?.view?.showLoading(false)
                 switch result {
-                case .success(let raw):
-                    self?.users = raw.enumerated().map { i, u in
+                case .success(let rawUsers):
+                    self?.users = rawUsers.enumerated().map { idx, u in
                         RatingViewModel(
-                            rank: i + 1,
+                            id: u.id,                   
+                            rank: idx + 1,
                             name: u.name,
                             nftCount: u.nfts.count,
                             avatarURL: URL(string: u.avatar ?? "")
