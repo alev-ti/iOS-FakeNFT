@@ -47,6 +47,10 @@ final class UserDetailPresenter: UserDetailPresenterProtocol {
     }
     
     func didTapCollection() {
-        // Навигация на экран коллекции будет реализована в эпике 3
+        guard let id = userModel?.id else { return }
+        let vc = UserCollectionAssembly.build(ownerId: id)
+        (view as? UIViewController)?
+            .navigationController?
+            .pushViewController(vc, animated: true)
     }
 }
