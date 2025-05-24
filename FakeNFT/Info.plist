@@ -2,8 +2,14 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>PracticumBaseURL</key>
+	<string>https://d5dn3j2ouj72b0ejucbl.apigw.yandexcloud.net/api/v1</string>
+	<key>PracticumMobileToken</key>
+	<string>e8b9b57e-63c9-4ebb-98c7-efad4d3d0fe2</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
+		<key>UIApplicationSupportsTabbedSceneCollection</key>
+		<false/>
 		<key>UIApplicationSupportsMultipleScenes</key>
 		<false/>
 		<key>UISceneConfigurations</key>
